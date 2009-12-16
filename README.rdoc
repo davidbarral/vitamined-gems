@@ -1,0 +1,72 @@
+= Vitamined gems
+
+Powered config.gem syntax to make your enviroment DRY
+
+Until the {gem bundler}[http://github.com/wycats/bundler] dominates the entire 
+world you can ease the pain of defining gem dependencies by vitamining your 
+environment file, avoiding, for example, the burden of adding :lib and :source 
+parameters when requiring github gems.
+
+  config.gem.github 'yfactorial-utility_scopes' 
+
+Many thanks to {Bruce Williams}[http://codefluency.com] for the {original idea}[http://codefluency.com/2009/02/07/a-githubby-config-gem-hack.html]
+that inspirated this code. Thanks as well to {Marcos Arias}[(http://github.com/yizzreel)] for
+his comments.
+
+This gem has been tested with Rails 2.2.x and Rails 2.3.x versions
+
+== Installation
+
+Just install the gem from {Gemcutter}[http://gemcutter.org]
+
+  $ gem install vitamined-gems --source http://gemcutter.org
+
+== Usage
+
+In your environment.rb file, load and initialize the gem before the 
+Rails::Initializer.run line. 
+
+  require 'vitamined-gems'
+  vitamine_gems!
+  
+After that you can use the extended syntax. By default github and gemcutter gems 
+are supported. Github gems automatically set the :lib and :source parameters, 
+while Gemcutter gems set the :source. You can override those values by providing 
+your own. The following config:
+
+  config.gem.cutter 'sugarfree-config', :version => '1.0.0'
+  config.gem.github 'yfactorial-utility_scopes', :version => '2.0.1'
+
+is equivalent to:
+
+  config.gem.gemcutter 'sugarfree-config', :version => '1.0.0', :source => 'http://gemcutter.org'
+  config.gem.github 'yfactorial-utility_scopes', :version => '2.0.1', :lib => 'utility_scopes', :source => 'http://gems.github.org'
+
+== Further customization
+
+You can add more vitamins or override the exsisting ones by passing a block to 
+the vitamine_gems! method like this
+
+  vitamine_gems! do 
+    github do |name, options| 
+      { :lib => name.split('-', 2).last, :source => 'http://gems.github.org' }
+    end
+    
+    cutter :source => 'http://gemcutter.org'
+  end
+
+or you can put a vitamin.rb file in the RAILS_ROOT/config folder 
+
+  github do |name, options| 
+    { :lib => name.split('-', 2).last, :source => 'http://gems.github.org' } 
+  end
+	
+  cutter :source => 'http://gemcutter.org'
+
+You can use both methods of customization in parallel. Just remember that in case
+of name clashing the block based config overrides the file based config. 
+
+== Contact
+
+Please mail bugs, suggestions and patches to 
+contact@davidbarral.com[mailto:contact@davidbarral.com]
